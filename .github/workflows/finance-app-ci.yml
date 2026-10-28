@@ -37,7 +37,7 @@ jobs:
 
       - name: Test
         working-directory: finance-app
-        run: npm test --if-present -- --runInBand
+        run: npm test
 
       - name: Build
         working-directory: finance-app
