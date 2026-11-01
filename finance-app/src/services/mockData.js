@@ -61,3 +61,12 @@ export const MOCK_HISTORY_7D  = Object.fromEntries(
 export const MOCK_HISTORY_90D = Object.fromEntries(
   TICKERS.map(({ symbol }) => [symbol, generateMockHistory(symbol, 90)])
 );
+
+/**
+ * Symbols the offline mock mode recognises for the custom-company chart.
+ * Anything else is treated as "not found" so the error path is testable offline.
+ */
+export const MOCK_SUPPORTED_SYMBOLS = [
+  ...TICKERS.map(({ symbol }) => symbol),
+  'AAPL', 'GOOGL', 'AMZN', 'META', 'NVDA', 'TSLA',
+];

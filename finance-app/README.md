@@ -20,6 +20,7 @@ Built with Vite, Recharts 3, and Zustand. Part of the IBM Bob SDLC Automation wo
 | Today    | Current-day quote card per company (price, Δ, volume, market cap) |
 | 7 Days   | Relative performance line chart — all companies on one axis, indexed to 100 |
 | Quarter  | 90-day area chart per company with QTD Δ%         |
+| Custom   | Enter any ticker; compares it with IBM (indexed to 100) over 7 days or a quarter. Invalid or unknown symbols show a clear message |
 
 ## Quick Start
 
@@ -55,13 +56,13 @@ src/
 │   ├── layout/      AppShell, Header, TabBar
 │   ├── cards/       QuoteCard, ChangeIndicator
 │   └── charts/      ComparisonChart, AreaChart
-├── views/           DayView, WeekView, QuarterView
+├── views/           DayView, WeekView, QuarterView, CustomView
 ├── services/        yahooFinance.js, normalizer.js, mockData.js
 ├── hooks/           useQuotes.js, useHistory.js
 ├── store/           dashboardStore.js (Zustand)
 ├── constants/       tickers.js (add/swap companies here)
-├── utils/           formatters.js
-└── __tests__/       22 unit tests
+├── utils/           formatters.js, symbols.js
+└── __tests__/       unit tests
 ```
 
 ## Data Layer
@@ -76,7 +77,7 @@ To add a competitor, edit [`src/constants/tickers.js`](src/constants/tickers.js)
 
 ```bash
 npm test
-# 22 tests across 4 suites — normalizer, formatters, QuoteCard, DayView
+# normalizer, formatters, symbols, QuoteCard, DayView, CustomView
 ```
 
 Tests never make network calls. All async data paths use mock fixtures from
