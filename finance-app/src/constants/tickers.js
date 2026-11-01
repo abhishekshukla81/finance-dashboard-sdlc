@@ -15,6 +15,9 @@ export const TICKERS = [
 /** Companies shown per page in Daily Performance Ranking and Quote Detail. */
 export const PAGE_SIZE = 8;
 
+/** Companies shown in Last 7 Days and Last Quarter (top by daily performance). */
+export const TOP_N = 8;
+
 /**
  * Colours for dynamically added companies, assigned in order and cycled.
  * Distinct from the tracked-company colours above.

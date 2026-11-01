@@ -58,7 +58,7 @@ describe('useCustomSymbolData (live mode)', () => {
   });
 });
 
-describe('fallback is opt-in (Last 7 Days / Last Quarter behaviour unchanged)', () => {
+describe('fallback is opt-in (default hook behaviour is unchanged)', () => {
   it('useHistory surfaces the error on HTTP 429 when fallback is not requested', async () => {
     fetchHistory.mockRejectedValue(httpError(429));
     const { result } = renderHook(() => useHistory('IBM', 'WEEK', { useMock: false }));

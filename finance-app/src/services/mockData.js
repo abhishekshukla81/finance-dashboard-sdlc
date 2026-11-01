@@ -6,7 +6,7 @@
  */
 import { TICKERS } from '../constants/tickers.js';
 import { isValidSymbol } from '../utils/symbols.js';
-import { generateMockQuote, generateMockHistory30 } from './mockGenerator.js';
+import { generateMockQuote, generateMockSeries } from './mockGenerator.js';
 
 // ─── Quote fixtures ──────────────────────────────────────────────────────────
 
@@ -40,12 +40,13 @@ export function getMockQuote(symbol) {
 }
 
 /**
- * Deterministic 30-day (31-point) offline history for any valid ticker,
- * ending at the same price as its offline quote. Null for an invalid ticker.
+ * Deterministic offline history of `days` days back plus today for any valid
+ * ticker, ending at the same price as its offline quote. Null for an invalid
+ * ticker.
  */
-export function getMockHistory30(symbol) {
+export function getMockHistory(symbol, days = 30) {
   const quote = getMockQuote(symbol);
-  return quote ? generateMockHistory30(symbol, quote.price) : null;
+  return quote ? generateMockSeries(symbol, days, quote.price) : null;
 }
 
 // ─── History fixture generator ───────────────────────────────────────────────

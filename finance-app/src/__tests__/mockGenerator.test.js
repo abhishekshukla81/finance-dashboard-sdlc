@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   generateMockQuote,
   generateMockHistory30,
+  generateMockSeries,
   MOCK_HISTORY_DAYS,
 } from '../services/mockGenerator.js';
 
@@ -82,5 +83,28 @@ describe('generateMockHistory30', () => {
 
   it('rejects an invalid symbol', () => {
     expect(() => generateMockHistory30('nope!')).toThrow('Invalid ticker symbol');
+  });
+});
+
+describe('generateMockSeries', () => {
+  it.each([[7, 8], [30, 31], [90, 91]])('%i days gives %i points ending at the quote price', (days, points) => {
+    const h = generateMockSeries('AAPL', days);
+    expect(h).toHaveLength(points);
+    expect(h[h.length - 1].close).toBe(generateMockQuote('AAPL').price);
+  });
+
+  it('is deterministic and the 7-day series is the tail of the 30-day series', () => {
+    const week = generateMockSeries('TSLA', 7).map((p) => p.close);
+    const month = generateMockSeries('TSLA', 30).map((p) => p.close);
+    expect(week).toEqual(generateMockSeries('TSLA', 7).map((p) => p.close));
+    expect(month.slice(-8)).toEqual(week);
+  });
+
+  it.each([0, -1, 1.5, 366, NaN])('rejects invalid day count %s', (days) => {
+    expect(() => generateMockSeries('AAPL', days)).toThrow('Invalid day count');
+  });
+
+  it('rejects an invalid symbol', () => {
+    expect(() => generateMockSeries('bad!', 7)).toThrow('Invalid ticker symbol');
   });
 });

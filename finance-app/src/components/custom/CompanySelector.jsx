@@ -11,9 +11,11 @@ import styles from './CompanySelector.module.css';
  * `onSubmit`; it holds no global state.
  *
  * Props:
- *   onSubmit  {(symbol: string) => void}  - called with a valid, normalised symbol
+ *   onSubmit     {(symbol: string) => void}  - called with a valid, normalised symbol
+ *   suggestions  {{ symbol: string, name?: string }[]}  - values offered in the
+ *                input's suggestion list (defaults to the tracked companies)
  */
-export default function CompanySelector({ onSubmit }) {
+export default function CompanySelector({ onSubmit, suggestions = TICKERS }) {
   const [input, setInput] = useState('');
   const [formError, setFormError] = useState(null);
 
@@ -49,7 +51,7 @@ export default function CompanySelector({ onSubmit }) {
           aria-invalid={Boolean(formError)}
         />
         <datalist id="custom-symbol-options">
-          {TICKERS.map(({ symbol, name }) => (
+          {suggestions.map(({ symbol, name }) => (
             <option key={symbol} value={symbol}>{name}</option>
           ))}
         </datalist>
