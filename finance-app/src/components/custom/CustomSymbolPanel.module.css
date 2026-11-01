@@ -101,3 +101,17 @@
   cursor: pointer;
   font-size: 0.75rem;
 }
+
+.simTag {
+  margin-left: 8px;
+  padding: 1px 6px;
+  border: 1px solid #b28600;
+  border-radius: 4px;
+  color: #7a5c00;
+  background: #fff8e1;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}

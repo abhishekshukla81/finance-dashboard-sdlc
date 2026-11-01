@@ -1,8 +1,10 @@
+import { useEffect } from 'react';
 import { TICKERS } from '../../constants/tickers.js';
 import useDashboardStore from '../../store/dashboardStore.js';
 import { useCustomSymbolData } from '../../hooks/useMarketData.js';
 import AreaChart from '../charts/AreaChart.jsx';
 import QuoteCard from '../cards/QuoteCard.jsx';
+import SimulatedDataNotice from '../common/SimulatedDataNotice.jsx';
 import styles from './CustomSymbolPanel.module.css';
 
 const USE_MOCK     = import.meta.env.VITE_USE_MOCK === 'true';
@@ -40,8 +42,17 @@ export default function CustomSymbolPanel() {
 }
 
 function CustomChart({ symbol }) {
-  const { history, quote, loading, error, notFound, refetch } =
+  const { history, quote, loading, error, notFound, simulated, simulatedReason, refetch } =
     useCustomSymbolData(symbol, { useMock: USE_MOCK });
+  const addCompany = useDashboardStore((s) => s.addCompany);
+
+  // Ingest the company into the dashboard only after its quote has resolved.
+  // Failed and no-data symbols never reach this point; Clear does not undo it.
+  const resolved = Boolean(quote) && !loading && !error && !notFound;
+  const quoteName = quote?.name;
+  useEffect(() => {
+    if (resolved) addCompany(symbol, quoteName);
+  }, [resolved, symbol, quoteName, addCompany]);
 
   if (notFound) {
     return (
@@ -69,16 +80,24 @@ function CustomChart({ symbol }) {
 
   const color = COLOR_MAP[symbol] ?? CUSTOM_COLOR;
   return (
-    <div className={styles.content}>
-      {quote && (
-        <div className={styles.summary} data-testid="summary-card">
-          <QuoteCard quote={quote} color={color} />
+    <>
+      {simulated && <SimulatedDataNotice reason={simulatedReason} />}
+      <div className={styles.content}>
+        {quote && (
+          <div className={styles.summary} data-testid="summary-card">
+            <QuoteCard quote={quote} color={color} />
+          </div>
+        )}
+        <div className={styles.chart} data-testid="price-chart">
+          <div className={styles.chartTitle}>
+            30-day price history
+            {simulated && (
+              <span className={styles.simTag} data-testid="simulated-tag">Simulated</span>
+            )}
+          </div>
+          <AreaChart history={history} color={color} height={200} />
         </div>
-      )}
-      <div className={styles.chart} data-testid="price-chart">
-        <div className={styles.chartTitle}>30-day price history</div>
-        <AreaChart history={history} color={color} height={200} />
       </div>
-    </div>
+    </>
   );
 }

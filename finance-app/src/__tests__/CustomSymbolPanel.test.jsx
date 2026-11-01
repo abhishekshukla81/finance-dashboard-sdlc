@@ -31,7 +31,7 @@ const points = (symbol) => [
 beforeEach(() => {
   vi.clearAllMocks();
   fetchQuotes.mockImplementation(async (symbols) => symbols.map(quote));
-  useDashboardStore.setState({ customSymbol: null });
+  useDashboardStore.setState({ customSymbol: null, addedCompanies: [] });
 });
 
 describe('CustomSymbolPanel', () => {
@@ -84,8 +84,11 @@ describe('CustomSymbolPanel', () => {
     expect(screen.queryByTestId('area-chart')).not.toBeInTheDocument();
   });
 
-  it('shows a clear error with Retry when the fetch fails', async () => {
-    fetchHistory.mockRejectedValue(new Error('Request timed out: /chart/NVDA'));
+  it('shows a clear error with Retry when the quote request is rejected', async () => {
+    // Timeouts, 429 and 5xx now fall back to simulated data, so use a
+    // non-fallback failure (HTTP 401) on the quote request.
+    fetchHistory.mockImplementation(async (s) => points(s));
+    fetchQuotes.mockRejectedValue(Object.assign(new Error('HTTP 401 from /quote'), { status: 401 }));
     useDashboardStore.setState({ customSymbol: 'NVDA' });
     render(<CustomSymbolPanel />);
     expect(await screen.findByRole('alert')).toHaveTextContent(/unable to load data for NVDA/i);
@@ -100,5 +103,86 @@ describe('CustomSymbolPanel', () => {
     await userEvent.click(screen.getByRole('button', { name: /clear/i }));
     expect(container).toBeEmptyDOMElement();
     expect(useDashboardStore.getState().customSymbol).toBeNull();
+  });
+
+  describe('ingestion into the dashboard list', () => {
+    const added = () => useDashboardStore.getState().addedCompanies.map((c) => c.symbol);
+
+    it('adds a company once its quote has loaded', async () => {
+      fetchHistory.mockImplementation(async (s) => points(s));
+      useDashboardStore.setState({ customSymbol: 'AAPL' });
+      render(<CustomSymbolPanel />);
+      await screen.findByTestId('area-chart');
+      await waitFor(() => expect(added()).toEqual(['AAPL']));
+      expect(useDashboardStore.getState().addedCompanies[0].name).toBe('AAPL Corp');
+    });
+
+    it('does not add a company twice', async () => {
+      fetchHistory.mockImplementation(async (s) => points(s));
+      useDashboardStore.setState({ customSymbol: 'AAPL' });
+      const { unmount } = render(<CustomSymbolPanel />);
+      await screen.findByTestId('area-chart');
+      unmount();
+      render(<CustomSymbolPanel />);
+      await screen.findByTestId('area-chart');
+      expect(added()).toEqual(['AAPL']);
+    });
+
+    it('does not add a tracked company', async () => {
+      fetchHistory.mockImplementation(async (s) => points(s));
+      useDashboardStore.setState({ customSymbol: 'NVDA' });
+      render(<CustomSymbolPanel />);
+      await screen.findByTestId('area-chart');
+      expect(added()).toEqual([]);
+    });
+
+    it('does not add a no-data symbol', async () => {
+      fetchHistory.mockRejectedValue(new Error('HTTP 404 from /chart/QQQQQ'));
+      fetchQuotes.mockResolvedValue([]);
+      useDashboardStore.setState({ customSymbol: 'QQQQQ' });
+      render(<CustomSymbolPanel />);
+      await screen.findByRole('alert');
+      expect(added()).toEqual([]);
+    });
+
+    it('does not add a symbol whose load failed', async () => {
+      fetchHistory.mockImplementation(async (s) => points(s));
+      fetchQuotes.mockRejectedValue(Object.assign(new Error('HTTP 401 from /quote'), { status: 401 }));
+      useDashboardStore.setState({ customSymbol: 'AAPL' });
+      render(<CustomSymbolPanel />);
+      await screen.findByRole('alert');
+      expect(added()).toEqual([]);
+    });
+
+    it('keeps the company after Clear', async () => {
+      fetchHistory.mockImplementation(async (s) => points(s));
+      useDashboardStore.setState({ customSymbol: 'AAPL' });
+      render(<CustomSymbolPanel />);
+      await screen.findByTestId('area-chart');
+      await waitFor(() => expect(added()).toEqual(['AAPL']));
+      await userEvent.click(screen.getByRole('button', { name: /clear/i }));
+      expect(added()).toEqual(['AAPL']);
+    });
+  });
+
+  describe('simulated tag', () => {
+    it('is hidden for live data', async () => {
+      fetchHistory.mockImplementation(async (s) => points(s));
+      useDashboardStore.setState({ customSymbol: 'NVDA' });
+      render(<CustomSymbolPanel />);
+      await screen.findByTestId('area-chart');
+      expect(screen.queryByTestId('simulated-tag')).not.toBeInTheDocument();
+    });
+
+    it('is shown when the source is rate limited (HTTP 429) and data falls back', async () => {
+      fetchHistory.mockRejectedValue(Object.assign(new Error('HTTP 429 from /chart/AAPL'), { status: 429 }));
+      fetchQuotes.mockRejectedValue(Object.assign(new Error('HTTP 429 from /quote'), { status: 429 }));
+      useDashboardStore.setState({ customSymbol: 'AAPL' });
+      render(<CustomSymbolPanel />);
+      expect(await screen.findByTestId('simulated-tag')).toHaveTextContent(/simulated/i);
+      expect(screen.getByTestId('simulated-notice')).toHaveTextContent(/live market data is currently unavailable/i);
+      expect(screen.getByTestId('price-chart')).toBeInTheDocument();
+      expect(screen.queryByText(/no data found/i)).not.toBeInTheDocument();
+    });
   });
 });

@@ -13,8 +13,9 @@ const BAR_W = 84;
  * Props:
  *   quotes  {QuoteShape[]}
  *   colors  {{ [symbol]: string }}
+ *   startRank {number} rank shown for the first row (page 2 of 6 starts at 7)
  */
-export default function PerformanceRanking({ quotes = [], colors = {} }) {
+export default function PerformanceRanking({ quotes = [], colors = {}, startRank = 1 }) {
   const ranked = [...quotes]
     .filter((q) => q.changePercent != null)
     .sort((a, b) => b.changePercent - a.changePercent);
@@ -28,7 +29,7 @@ export default function PerformanceRanking({ quotes = [], colors = {} }) {
         const tone     = positive ? GREEN : RED;
         return (
           <li key={q.symbol} data-symbol={q.symbol} style={{ ...styles.row, borderTop: i === 0 ? 'none' : '1px solid #f0f1f3' }}>
-            <span style={styles.rank}>{i + 1}</span>
+            <span style={styles.rank}>{startRank + i}</span>
             <span style={{ ...styles.dot, backgroundColor: colors[q.symbol] ?? '#0f62fe' }} />
             <span style={styles.symbol}>{q.symbol}</span>
             <span style={styles.name}>{q.name}</span>

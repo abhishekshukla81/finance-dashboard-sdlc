@@ -1,0 +1,10 @@
+.notice {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border: 1px solid #f1d96b;
+  border-radius: 6px;
+  background: #fff8e1;
+  color: #7a5c00;
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
