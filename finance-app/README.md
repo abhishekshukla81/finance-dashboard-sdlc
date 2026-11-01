@@ -20,7 +20,13 @@ Built with Vite, Recharts 3, and Zustand. Part of the IBM Bob SDLC Automation wo
 | Today    | Current-day quote card per company (price, Δ, volume, market cap) |
 | 7 Days   | Relative performance line chart — all companies on one axis, indexed to 100 |
 | Quarter  | 90-day area chart per company with QTD Δ%         |
-| Custom   | Enter any ticker; compares it with IBM (indexed to 100) over 7 days or a quarter. Invalid or unknown symbols show a clear message |
+
+## Custom Company Panel
+
+Below every tab, a **Custom Company vs IBM** panel lets you enter any ticker (for example `NVDA`)
+and compares it with IBM over 7 days or a quarter, both indexed to 100. Invalid symbols are
+rejected up front, and a symbol with no data shows "No data found for XYZ" instead of any
+other company's data. The tracked-company dashboards above it are unchanged.
 
 ## Quick Start
 
@@ -55,10 +61,11 @@ src/
 ├── components/
 │   ├── layout/      AppShell, Header, TabBar
 │   ├── cards/       QuoteCard, ChangeIndicator
+│   ├── custom/      CompanySelector, CustomSymbolPanel
 │   └── charts/      ComparisonChart, AreaChart
-├── views/           DayView, WeekView, QuarterView, CustomView
+├── views/           DayView, WeekView, QuarterView
 ├── services/        yahooFinance.js, normalizer.js, mockData.js
-├── hooks/           useQuotes.js, useHistory.js
+├── hooks/           useQuotes.js, useHistory.js, useMarketData.js
 ├── store/           dashboardStore.js (Zustand)
 ├── constants/       tickers.js (add/swap companies here)
 ├── utils/           formatters.js, symbols.js
@@ -77,7 +84,7 @@ To add a competitor, edit [`src/constants/tickers.js`](src/constants/tickers.js)
 
 ```bash
 npm test
-# normalizer, formatters, symbols, QuoteCard, DayView, CustomView
+# normalizer, formatters, symbols, QuoteCard, DayView, CustomSymbolPanel, useCustomSymbolData
 ```
 
 Tests never make network calls. All async data paths use mock fixtures from

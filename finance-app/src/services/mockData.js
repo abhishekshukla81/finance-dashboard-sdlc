@@ -8,7 +8,7 @@ import { TICKERS } from '../constants/tickers.js';
 
 // ─── Quote fixtures ──────────────────────────────────────────────────────────
 
-const BASE_PRICES = { IBM: 171.42, MSFT: 415.30, ORCL: 139.85, SAP: 211.60, CRM: 302.75 };
+const BASE_PRICES = { IBM: 171.42, MSFT: 415.30, ORCL: 139.85, SAP: 211.60, CRM: 302.75, NVDA: 118.40 };
 const BASE_CHANGES = { IBM: 1.23, MSFT: -2.15, ORCL: 0.95, SAP: 3.40, CRM: -1.80 };
 
 export const MOCK_QUOTES = TICKERS.map(({ symbol, name }) => {

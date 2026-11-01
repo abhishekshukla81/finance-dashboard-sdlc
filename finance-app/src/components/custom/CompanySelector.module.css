@@ -1,0 +1,39 @@
+.form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1f2328;
+}
+
+.input {
+  padding: 6px 10px;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  width: 120px;
+}
+
+.submit {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #0f62fe;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.error {
+  color: #b91c1c;
+  font-size: 0.8rem;
+  margin-bottom: 8px;
+}
