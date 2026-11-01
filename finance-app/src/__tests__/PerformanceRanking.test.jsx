@@ -19,9 +19,9 @@ describe('PerformanceRanking', () => {
   });
 
   it('numbers rows from startRank so ranks continue across pages', () => {
-    render(<PerformanceRanking quotes={MOCK_QUOTES.slice(0, 2)} startRank={7} />);
+    render(<PerformanceRanking quotes={MOCK_QUOTES.slice(0, 2)} startRank={9} />);
     const rows = screen.getAllByRole('listitem');
-    expect(rows[0]).toHaveTextContent(/^7/);
-    expect(rows[1]).toHaveTextContent(/^8/);
+    expect(rows[0]).toHaveTextContent(/^9/);
+    expect(rows[1]).toHaveTextContent(/^10/);
   });
 });

@@ -27,7 +27,7 @@ export function paginate(items, page, pageSize = PAGE_SIZE) {
   return items.slice((p - 1) * pageSize, p * pageSize);
 }
 
-/** 1-based rank of the first item on a page (page 2 with size 6 starts at 7). */
+/** 1-based rank of the first item on a page (page 2 with size 8 starts at 9). */
 export function startRank(page, total, pageSize = PAGE_SIZE) {
   return (clampPage(page, total, pageSize) - 1) * pageSize + 1;
 }

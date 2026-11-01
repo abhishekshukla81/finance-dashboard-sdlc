@@ -7,7 +7,7 @@ Extend the finance dashboard (`finance-app/`) so that:
 1. A deterministic generator can produce a realistic quote and 30-day history for ANY 1-5 letter ticker.
 2. That generated data is served automatically when `VITE_USE_MOCK=true`, or when live Yahoo data fails or is rate limited, and the UI says so.
 3. A ticker loaded in the Custom Company section is appended (deduplicated) to a dashboard company list in the store, and appears in Daily Performance Ranking and Quote Detail.
-4. Those two sections paginate (6 per page, synchronized controls) only when more than 6 companies are present.
+4. Those two sections paginate (8 per page, synchronized controls) only when more than 8 companies are present.
 
 The Custom Company section stays unpaginated and unchanged in layout. Last 7 Days and Last Quarter are NOT touched at all (approved scope): no file edits, no fallback, no notice. Fallback and the simulated-data notice apply to the Today tab and the Custom panel only; added companies appear on the Today tab only.
 
@@ -26,7 +26,7 @@ Approach: additive and opt-in. New service modules, one new store slice, one new
 | AC-7 | When any displayed data is simulated, the UI shows a visible notice (reason: mock mode or live data unavailable) | Component test |
 | AC-8 | Loading a valid ticker renders it in the Custom panel AND appends it to the store company list; a ticker already tracked or already added is not duplicated | Store and flow tests |
 | AC-9 | An added company appears in Daily Performance Ranking (ranked by daily change) and in Quote Detail with its quote and change data | Component and flow tests |
-| AC-10 | With 6 or fewer companies no pagination controls are shown; with 7 or more, Previous / Page X of Y / Next appear on BOTH sections and exactly 6 companies are shown per page | Pagination and component tests |
+| AC-10 | With 8 or fewer companies no pagination controls are shown; with 9 or more, Previous / Page X of Y / Next appear on BOTH sections and exactly 8 companies are shown per page | Pagination and component tests |
 | AC-11 | Pagination state is synchronized across the two sections; Previous is disabled on page 1 and Next on the last page; the page is clamped if the list shrinks | Pagination tests |
 | AC-12 | Custom Company section is unpaginated and behaves as today (Load button, Currently showing, quote card, 30-day chart, Clear) | Existing tests plus flow test |
 | AC-13 | Last 7 Days and Last Quarter are unchanged: `WeekView.jsx` and `QuarterView.jsx` are not modified, they never fall back, never show the notice, and are unaffected by added companies; their hook calls behave as today | Git diff shows no change to those files; existing tests; hook test proving default (no opt-in) behaviour is unchanged |
@@ -37,7 +37,7 @@ Approach: additive and opt-in. New service modules, one new store slice, one new
 These come from the requirements and the code research. Each has a recommended default.
 
 - **D1. The "No data found" message becomes unreachable in mock mode.** Requirement 1 says any valid ticker gets mock data, but the previously approved walkthrough and two existing tests expect AAPL to show "No data found" in mock mode. The no-data path remains live-mode only (HTTP 404 or empty result). Two existing tests must therefore be changed deliberately, which conflicts with "all existing tests continue to pass". Recommended default: accept this, update only those two tests, and keep the no-data path covered by the live-mode (mocked service) tests.
-- **D2. Ordering of Quote Detail when paginated.** Ranking is ordered by daily change; Quote Detail today follows tracked order. If each keeps its own order, "Page 1" shows different companies in the two sections. Recommended default: when more than 6 companies exist, both sections use the same ranked order so each page shows the same six; with 6 or fewer, Quote Detail keeps today's order.
+- **D2. Ordering of Quote Detail when paginated.** Ranking is ordered by daily change; Quote Detail today follows tracked order. If each keeps its own order, "Page 1" shows different companies in the two sections. Recommended default: when more than 8 companies exist, both sections use the same ranked order so each page shows the same eight; with 8 or fewer, Quote Detail keeps today's order.
 - **D3 (decided). Where fallback and the notice apply.** Today and the Custom panel only. Last 7 Days and Last Quarter are not touched. Because `useHistory` is shared, fallback is an opt-in option that defaults to off; only the Custom panel and Today pass it. Consequence to be aware of: if Yahoo rate limits, those two views keep showing their existing error state rather than simulated data.
 - **D4. When a ticker is appended.** Recommended default: only after its quote resolves successfully (never for a failed or no-data symbol).
 - **D5. Verification limit.** In forced mock mode, or when falling back after a 429, a ticker cannot be verified against Yahoo, so a made-up symbol such as QQQQQ will appear as a simulated company. The notice must say the data is simulated and unverified.
@@ -95,7 +95,7 @@ These come from the requirements and the code research. Each has a recommended d
 - **Intent:** A reusable, tested pagination primitive used only by the two dashboard sections.
 - **Expected Outcomes:** Pure helper functions plus a Previous / Page X of Y / Next component that renders nothing when there is a single page.
 - **Todo List:**
-  1. Add a page-size constant of 6.
+  1. Add a page-size constant of 8 (changed from 6 on request).
   2. Add pure helpers: page count, clamp, slice for a page.
   3. Add the pagination component with disabled states at the ends and accessible labels.
   4. Unit and component tests for AC-10 and AC-11.
@@ -104,13 +104,13 @@ These come from the requirements and the code research. Each has a recommended d
 
 ### Sub-Task 6: Dashboard integration (Today tab)
 - **Intent:** Show tracked plus added companies in Daily Performance Ranking and Quote Detail, paginated.
-- **Expected Outcomes:** Both sections read the same combined list, share one page state, and show controls only above 6 companies.
+- **Expected Outcomes:** Both sections read the same combined list, share one page state, and show controls only above 8 companies.
 - **Todo List:**
   1. In `DayView`, build the symbol list from `TICKERS` plus the store list and fetch quotes for all of them.
   2. Take names and colours for added companies from their quotes and the palette.
   3. Apply the ordering decision D2, slice both sections by the shared page, and render the pagination component under each.
   4. Avoid blanking the whole view while an added company loads (keep the previous quotes visible during refetch).
-  5. Update `PerformanceRanking` so rank numbers continue across pages (page 2 starts at 7).
+  5. Update `PerformanceRanking` so rank numbers continue across pages (page 2 starts at 9).
 - **Relevant Context:** `finance-app/src/views/DayView.jsx`; `finance-app/src/components/cards/PerformanceRanking.jsx`; `finance-app/src/components/cards/QuoteCard.jsx`.
 - **Status:** [x] done
 

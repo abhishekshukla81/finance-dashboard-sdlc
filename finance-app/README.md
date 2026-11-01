@@ -17,7 +17,7 @@ Built with Vite, Recharts 3, and Zustand. Part of the IBM Bob SDLC Automation wo
 
 | Tab      | What it shows                                     |
 |----------|---------------------------------------------------|
-| Today    | Daily Performance Ranking and a quote card per company (price, Δ, volume, market cap), including added tickers, 6 per page |
+| Today    | Daily Performance Ranking and a quote card per company (price, Δ, volume, market cap), including added tickers, 8 per page |
 | 7 Days   | Relative performance line chart — all companies on one axis, indexed to 100 |
 | Quarter  | 90-day area chart per company with QTD Δ%         |
 
@@ -38,9 +38,9 @@ A ticker that loads successfully in the Custom Company section is also added to 
 the six tracked companies), and kept for the session; **Clear** does not remove them. Symbols that
 fail or return no data are never added. **Last 7 Days** and **Last Quarter** are not affected.
 
-Above 6 companies both Today sections show 6 per page with Previous / Page X of Y / Next controls.
+Above 8 companies both Today sections show 8 per page with Previous / Page X of Y / Next controls.
 They share one page and one ranked order, and rank numbers continue across pages (page 2 starts
-at 7). With 6 or fewer companies there are no controls.
+at 9). With 8 or fewer companies there are no controls.
 
 ### Simulated data
 

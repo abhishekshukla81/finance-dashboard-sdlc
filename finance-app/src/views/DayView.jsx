@@ -24,7 +24,7 @@ const byDailyChange = (a, b) => {
  * DayView
  *
  * Current-day market summary for the tracked companies plus any companies
- * added from the Custom Company section. Above 6 companies, Daily Performance
+ * added from the Custom Company section. Above 8 companies, Daily Performance
  * Ranking and Quote Detail share one ranked order and one page.
  */
 export default function DayView() {
@@ -49,7 +49,7 @@ export default function DayView() {
   const paginated = needsPagination(total);
   const current   = clampPage(page, total);
 
-  // With more than 6 companies both sections use the same ranked order, so each
+  // With more than 8 companies both sections use the same ranked order, so each
   // page shows the same companies. Otherwise Quote Detail keeps tracked order.
   const ranked       = [...quotes].sort(byDailyChange);
   const rankingItems = paginated ? paginate(ranked, current) : quotes;

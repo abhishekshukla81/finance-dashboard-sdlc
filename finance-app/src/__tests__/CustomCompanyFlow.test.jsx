@@ -68,7 +68,7 @@ describe('Custom Company flow (offline mock mode)', () => {
 });
 
 describe('Dynamic ticker ingestion (offline mock mode)', () => {
-  it('adds loaded tickers to the Today lists and paginates above six companies', async () => {
+  it('adds loaded tickers to the Today lists and paginates above eight companies', async () => {
     useDashboardStore.setState({ addedCompanies: [] });
     render(<App />);
     await screen.findByText('Quote Detail');
@@ -83,8 +83,16 @@ describe('Dynamic ticker ingestion (offline mock mode)', () => {
     await screen.findByTestId('price-chart');
     expect(useDashboardStore.getState().addedCompanies).toEqual([]);
 
-    // A new valid ticker joins the dashboard, making seven companies.
+    // New valid tickers join the dashboard: 7 and 8 companies fit on one page.
     await load('aapl');
+    await screen.findByTestId('price-chart');
+    await load('TSLA');
+    await screen.findByTestId('price-chart');
+    expect(useDashboardStore.getState().addedCompanies).toHaveLength(2);
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+
+    // The 9th company introduces pagination on both sections.
+    await load('GOOGL');
     await screen.findByTestId('price-chart');
     expect(await screen.findAllByText('Page 1 of 2')).toHaveLength(2);
 
@@ -92,12 +100,12 @@ describe('Dynamic ticker ingestion (offline mock mode)', () => {
     await load('AAPL');
     await screen.findByTestId('price-chart');
     await userEvent.click(screen.getByRole('button', { name: /clear/i }));
-    expect(useDashboardStore.getState().addedCompanies.map((c) => c.symbol)).toEqual(['AAPL']);
+    expect(useDashboardStore.getState().addedCompanies.map((c) => c.symbol)).toEqual(['AAPL', 'TSLA', 'GOOGL']);
 
-    // The 7th company is on page 2 of the ranking, with rank 7.
+    // The 9th company is on page 2 of the ranking, with rank 9.
     await userEvent.click(screen.getAllByRole('button', { name: 'Next' })[0]);
     const rows = within(screen.getByRole('list', { name: /daily performance ranking/i })).getAllByRole('listitem');
     expect(rows).toHaveLength(1);
-    expect(rows[0]).toHaveTextContent(/^7/);
+    expect(rows[0]).toHaveTextContent(/^9/);
   });
 });

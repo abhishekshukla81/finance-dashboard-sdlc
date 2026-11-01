@@ -45,23 +45,40 @@ describe('DayView with the six tracked companies', () => {
 });
 
 describe('DayView with added companies', () => {
-  it('a 7th company adds pagination to both sections', async () => {
+  it('shows 7 and 8 companies on one page, without controls', async () => {
     addCompanies(['AAPL']);
+    const { unmount } = render(<DayView />);
+    await screen.findByText('Quote Detail');
+    expect(rankingRows()).toHaveLength(7);
+    expect(detailSymbols()).toHaveLength(7);
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    unmount();
+
+    addCompanies(['AAPL', 'TSLA']);
+    render(<DayView />);
+    await screen.findByText('Quote Detail');
+    expect(rankingRows()).toHaveLength(8);
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+  });
+
+  it('a 9th company adds pagination to both sections', async () => {
+    addCompanies(['AAPL', 'TSLA', 'GOOGL']);
     render(<DayView />);
     await screen.findByText('Quote Detail');
     expect(screen.getAllByRole('navigation')).toHaveLength(2);
     expect(screen.getAllByText('Page 1 of 2')).toHaveLength(2);
-    expect(rankingSymbols().length + detailSymbols().length).toBe(12);
+    expect(rankingRows()).toHaveLength(8);
+    expect(detailSymbols()).toHaveLength(8);
   });
 
-  it('shows 6 per page, with the same companies in both sections', async () => {
+  it('shows 8 per page, with the same companies in both sections', async () => {
     addCompanies(EXTRA);
     render(<DayView />);
     await screen.findByText('Quote Detail');
-    expect(rankingRows()).toHaveLength(6);
-    expect(detailSymbols()).toHaveLength(6);
+    expect(rankingRows()).toHaveLength(8);
+    expect(detailSymbols()).toHaveLength(8);
     expect([...detailSymbols()].sort()).toEqual([...rankingSymbols()].sort());
-    expect(screen.getAllByText('Page 1 of 3')).toHaveLength(2);
+    expect(screen.getAllByText('Page 1 of 2')).toHaveLength(2);
   });
 
   it('ranks all companies by daily change across pages', async () => {
@@ -85,8 +102,8 @@ describe('DayView with added companies', () => {
     expect(rankingRows()[0]).toHaveTextContent(/^1/);
 
     await userEvent.click(screen.getAllByRole('button', { name: 'Next' })[1]); // Quote Detail control
-    expect(screen.getAllByText('Page 2 of 3')).toHaveLength(2);
-    expect(rankingRows()[0]).toHaveTextContent(/^7/);
+    expect(screen.getAllByText('Page 2 of 2')).toHaveLength(2);
+    expect(rankingRows()[0]).toHaveTextContent(/^9/);
     expect([...detailSymbols()].sort()).toEqual([...rankingSymbols()].sort());
   });
 
@@ -95,10 +112,9 @@ describe('DayView with added companies', () => {
     render(<DayView />);
     await screen.findByText('Quote Detail');
     await userEvent.click(screen.getAllByRole('button', { name: 'Next' })[0]);
-    await userEvent.click(screen.getAllByRole('button', { name: 'Next' })[0]);
-    expect(screen.getAllByText('Page 3 of 3')).toHaveLength(2);
-    expect(rankingRows()).toHaveLength(13 - 12);
-    expect(rankingRows()[0]).toHaveTextContent(/^13/);
+    expect(screen.getAllByText('Page 2 of 2')).toHaveLength(2);
+    expect(rankingRows()).toHaveLength(13 - 8);
+    expect(detailSymbols()).toHaveLength(13 - 8);
     screen.getAllByRole('button', { name: 'Next' }).forEach((b) => expect(b).toBeDisabled());
   });
 
@@ -109,8 +125,6 @@ describe('DayView with added companies', () => {
     const seen = [...rankingSymbols()];
     await userEvent.click(screen.getAllByRole('button', { name: 'Next' })[0]);
     seen.push(...rankingSymbols());
-    await userEvent.click(screen.getAllByRole('button', { name: 'Next' })[0]);
-    seen.push(...rankingSymbols());
     expect(seen.sort()).toEqual(['IBM','MSFT','ORCL','SAP','CRM','NVDA', ...EXTRA].sort());
   });
 
@@ -119,8 +133,7 @@ describe('DayView with added companies', () => {
     render(<DayView />);
     await screen.findByText('Quote Detail');
     await userEvent.click(screen.getAllByRole('button', { name: 'Next' })[0]);
-    await userEvent.click(screen.getAllByRole('button', { name: 'Next' })[0]);
-    expect(screen.getAllByText('Page 3 of 3')).toHaveLength(2);
+    expect(screen.getAllByText('Page 2 of 2')).toHaveLength(2);
 
     useDashboardStore.setState({ addedCompanies: [] });
     await waitFor(() => expect(screen.queryByRole('navigation')).not.toBeInTheDocument());

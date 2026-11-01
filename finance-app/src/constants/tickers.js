@@ -13,7 +13,7 @@ export const TICKERS = [
 ];
 
 /** Companies shown per page in Daily Performance Ranking and Quote Detail. */
-export const PAGE_SIZE = 6;
+export const PAGE_SIZE = 8;
 
 /**
  * Colours for dynamically added companies, assigned in order and cycled.
