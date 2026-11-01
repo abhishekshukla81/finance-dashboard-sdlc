@@ -5,6 +5,7 @@ const TABS = [
   { key: 'day',     label: RANGES.DAY.label     },
   { key: 'week',    label: RANGES.WEEK.label    },
   { key: 'quarter', label: RANGES.QUARTER.label },
+  { key: 'custom',  label: 'Custom'              },
 ];
 
 /**
