@@ -78,22 +78,27 @@ export function generateMockQuote(symbol) {
 }
 
 /**
- * Generate a deterministic 31-point (30 days back + today) daily history.
- * The last close equals `endPrice`, so the chart agrees with the quote.
+ * Generate a deterministic daily history of `days` days back plus today
+ * (`days + 1` points). The last close equals `endPrice`, so the chart agrees
+ * with the quote. The walk goes backwards from the end price using the same
+ * seeded sequence for every window, so a 7-day series is the tail of the
+ * 30-day series for the same symbol.
  * @param {string} symbol
+ * @param {number} days - whole days back from today (1–365)
  * @param {number} [endPrice] - defaults to the generated quote price
  * @returns {import('./normalizer.js').HistoryPoint[]}
- * @throws {Error} when the symbol is not a valid ticker
+ * @throws {Error} when the symbol or day count is invalid
  */
-export function generateMockHistory30(symbol, endPrice) {
+export function generateMockSeries(symbol, days, endPrice) {
   if (!isValidSymbol(symbol)) throw new Error('Invalid ticker symbol');
+  if (!Number.isInteger(days) || days < 1 || days > 365) throw new Error('Invalid day count');
 
   const last = endPrice ?? generateMockQuote(symbol).price;
   const rand = seededRandom(hashString(`history:${symbol}`));
 
-  const closes = new Array(MOCK_HISTORY_DAYS + 1);
-  closes[MOCK_HISTORY_DAYS] = last;
-  for (let i = MOCK_HISTORY_DAYS; i > 0; i--) {
+  const closes = new Array(days + 1);
+  closes[days] = last;
+  for (let i = days; i > 0; i--) {
     const dailyReturn = (rand() - 0.5) * 0.04; // ±2% per day
     closes[i - 1] = Math.max(0.01, closes[i] / (1 + dailyReturn));
   }
@@ -101,7 +106,12 @@ export function generateMockHistory30(symbol, endPrice) {
   const today = new Date();
   return closes.map((close, idx) => {
     const date = new Date(today);
-    date.setDate(today.getDate() - (MOCK_HISTORY_DAYS - idx));
+    date.setDate(today.getDate() - (days - idx));
     return { symbol, date, close: round2(close) };
   });
+}
+
+/** 31-point (30 days back + today) history. */
+export function generateMockHistory30(symbol, endPrice) {
+  return generateMockSeries(symbol, MOCK_HISTORY_DAYS, endPrice);
 }

@@ -109,3 +109,38 @@ describe('Dynamic ticker ingestion (offline mock mode)', () => {
     expect(rows[0]).toHaveTextContent(/^9/);
   });
 });
+
+describe('Added companies in Last 7 Days, Last Quarter and the suggestion list', () => {
+  const suggestionValues = () =>
+    [...document.querySelectorAll('#custom-symbol-options option')].map((o) => o.value);
+
+  it('shows an added company everywhere and caps the views at the top 8', async () => {
+    useDashboardStore.setState({ activeTab: 'day', customSymbol: null, addedCompanies: [] });
+    render(<App />);
+    await screen.findByText('Quote Detail');
+    expect(suggestionValues()).toEqual(['IBM', 'MSFT', 'ORCL', 'SAP', 'CRM', 'NVDA']);
+
+    // Load a new ticker: it joins the suggestion list.
+    await load('AAPL');
+    await screen.findByTestId('price-chart');
+    expect(suggestionValues()).toEqual(['IBM', 'MSFT', 'ORCL', 'SAP', 'CRM', 'NVDA', 'AAPL']);
+
+    // Last 7 Days and Last Quarter include it (7 of 7).
+    await userEvent.click(screen.getByRole('tab', { name: 'Last 7 Days' }));
+    expect(await screen.findByTestId('comparison-chart')).toBeInTheDocument();
+    expect(screen.getByTestId('top-caption')).toHaveTextContent('Showing top 7 of 7');
+    await userEvent.click(screen.getByRole('tab', { name: 'Last Quarter' }));
+    expect(await screen.findByTestId('top-caption')).toHaveTextContent('Showing top 7 of 7');
+
+    // Add more until there are more than 8: the views cap at 8.
+    for (const sym of ['TSLA', 'GOOGL', 'META']) {
+      await load(sym);
+      await screen.findByTestId('price-chart');
+    }
+    expect(suggestionValues()).toHaveLength(10);
+    expect(screen.getByTestId('top-caption')).toHaveTextContent('Showing top 8 of 10');
+    await userEvent.click(screen.getByRole('tab', { name: 'Last 7 Days' }));
+    expect(await screen.findByTestId('top-caption')).toHaveTextContent('Showing top 8 of 10');
+  });
+});
+

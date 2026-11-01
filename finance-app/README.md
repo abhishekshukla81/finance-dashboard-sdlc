@@ -18,8 +18,8 @@ Built with Vite, Recharts 3, and Zustand. Part of the IBM Bob SDLC Automation wo
 | Tab      | What it shows                                     |
 |----------|---------------------------------------------------|
 | Today    | Daily Performance Ranking and a quote card per company (price, Δ, volume, market cap), including added tickers, 8 per page |
-| 7 Days   | Relative performance line chart — all companies on one axis, indexed to 100 |
-| Quarter  | 90-day area chart per company with QTD Δ%         |
+| 7 Days   | Relative performance line chart — top 8 companies on one axis, indexed to 100 |
+| Quarter  | 90-day area chart for the top 8 companies with QTD Δ% |
 
 ## Custom Company
 
@@ -36,7 +36,12 @@ dashboards above are unchanged.
 A ticker that loads successfully in the Custom Company section is also added to the **Today** tab
 (Daily Performance Ranking and Quote Detail). Tickers are normalised, never duplicated (including
 the six tracked companies), and kept for the session; **Clear** does not remove them. Symbols that
-fail or return no data are never added. **Last 7 Days** and **Last Quarter** are not affected.
+fail or return no data are never added. Added tickers also appear in the ticker input's
+suggestion list.
+
+**Last 7 Days** and **Last Quarter** include added companies too, but show only the **top 8** by
+today's Daily Performance Ranking (a caption reads "Showing top 8 of N companies"). Their history
+falls back to simulated data like the Today tab, with the same notice.
 
 Above 8 companies both Today sections show 8 per page with Previous / Page X of Y / Next controls.
 They share one page and one ranked order, and rank numbers continue across pages (page 2 starts
@@ -93,10 +98,10 @@ src/
 │   └── charts/      ComparisonChart, AreaChart
 ├── views/           DayView, WeekView, QuarterView
 ├── services/        yahooFinance.js, normalizer.js, mockData.js, mockGenerator.js, marketDataService.js
-├── hooks/           useQuotes.js, useHistory.js, useMarketData.js
+├── hooks/           useQuotes.js, useHistory.js, useHistories.js, useTopCompanies.js, useMarketData.js
 ├── store/           dashboardStore.js (Zustand)
 ├── constants/       tickers.js (add/swap companies here)
-├── utils/           formatters.js, symbols.js, pagination.js
+├── utils/           formatters.js, symbols.js, pagination.js, ranking.js
 └── __tests__/       unit tests
 ```
 
@@ -113,7 +118,8 @@ To add a competitor, edit [`src/constants/tickers.js`](src/constants/tickers.js)
 ```bash
 npm test
 # normalizer, formatters, symbols, store, QuoteCard, DayView, PerformanceRanking, CompanySelector, CustomSymbolPanel,
-# useCustomSymbolData, custom-company flow, mock generator, fallback service/hooks, pagination, simulated notice
+# useCustomSymbolData, custom-company flow, mock generator, fallback service/hooks, pagination, simulated notice,
+# top-8 Week/Quarter views, useTopCompanies, useHistories
 ```
 
 Tests never make network calls. All async data paths use mock fixtures from

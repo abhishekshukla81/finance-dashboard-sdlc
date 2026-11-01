@@ -13,11 +13,14 @@
  * data. Simulated data is unverified and must never be presented as real.
  */
 import { fetchQuotes, fetchHistory } from './yahooFinance.js';
-import { getMockQuote, getMockHistory30 } from './mockData.js';
+import { getMockQuote, getMockHistory } from './mockData.js';
 import { RANGES } from '../constants/tickers.js';
 
 export const SOURCE = Object.freeze({ LIVE: 'live', SIMULATED: 'simulated' });
 export const REASON = Object.freeze({ MOCK_MODE: 'mock-mode', UNAVAILABLE: 'unavailable' });
+
+/** Days of simulated history per window (matches the live ranges). */
+const MOCK_DAYS = Object.freeze({ WEEK: 7, MONTH: 30, QUARTER: 90 });
 
 /**
  * Whether a failed live request means "source unavailable" (fall back)
@@ -54,15 +57,15 @@ export async function getQuotes(symbols, { useMock = false } = {}) {
 }
 
 /**
- * Price history for one symbol. Simulated history is always the
- * deterministic 30-day series.
+ * Price history for one symbol. Simulated history is deterministic and sized
+ * to the window: 7 days (8 points), 30 days (31 points) or 90 days (91 points).
  * @param {string} symbol
  * @param {keyof typeof RANGES} windowKey
  * @param {{ useMock?: boolean }} [options]
  * @returns {Promise<{ data: object[], source: string, reason: string|null }>}
  */
 export async function getHistory(symbol, windowKey, { useMock = false } = {}) {
-  const mock = () => getMockHistory30(symbol) ?? [];
+  const mock = () => getMockHistory(symbol, MOCK_DAYS[windowKey] ?? 30) ?? [];
 
   if (useMock) return simulated(mock(), REASON.MOCK_MODE);
   const { range, interval } = RANGES[windowKey] ?? RANGES.MONTH;

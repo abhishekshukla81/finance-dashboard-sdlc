@@ -3,6 +3,7 @@ import { TICKERS } from '../constants/tickers.js';
 import { useQuotes } from '../hooks/useQuotes.js';
 import useDashboardStore from '../store/dashboardStore.js';
 import { paginate, clampPage, needsPagination, startRank } from '../utils/pagination.js';
+import { rankByDailyChange } from '../utils/ranking.js';
 import QuoteCard from '../components/cards/QuoteCard.jsx';
 import PerformanceRanking from '../components/cards/PerformanceRanking.jsx';
 import Pagination from '../components/common/Pagination.jsx';
@@ -12,13 +13,6 @@ import { SOURCE } from '../services/marketDataService.js';
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
 const TRACKED_SYMBOLS = TICKERS.map((t) => t.symbol);
 const TRACKED_COLORS  = Object.fromEntries(TICKERS.map((t) => [t.symbol, t.color]));
-
-/** Best daily change first; quotes without a change go last. */
-const byDailyChange = (a, b) => {
-  const pa = a.changePercent ?? -Infinity;
-  const pb = b.changePercent ?? -Infinity;
-  return pa === pb ? 0 : pb - pa;
-};
 
 /**
  * DayView
@@ -51,7 +45,7 @@ export default function DayView() {
 
   // With more than 8 companies both sections use the same ranked order, so each
   // page shows the same companies. Otherwise Quote Detail keeps tracked order.
-  const ranked       = [...quotes].sort(byDailyChange);
+  const ranked       = rankByDailyChange(quotes);
   const rankingItems = paginated ? paginate(ranked, current) : quotes;
   const detailItems  = paginated ? rankingItems : quotes;
 

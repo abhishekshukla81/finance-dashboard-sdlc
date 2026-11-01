@@ -32,4 +32,20 @@ describe('CompanySelector', () => {
     expect(screen.getByRole('alert')).toBeInTheDocument();
     expect(onSubmit).not.toHaveBeenCalled();
   });
+
+  describe('suggestion list', () => {
+    const options = () => [...document.querySelectorAll('#custom-symbol-options option')].map((o) => o.value);
+
+    it('offers the tracked companies by default', () => {
+      render(<CompanySelector onSubmit={vi.fn()} />);
+      expect(options()).toEqual(['IBM', 'MSFT', 'ORCL', 'SAP', 'CRM', 'NVDA']);
+    });
+
+    it('offers tracked and added companies when suggestions are passed', () => {
+      const suggestions = [{ symbol: 'IBM', name: 'IBM' }, { symbol: 'AAPL', name: 'Apple Inc.' }];
+      render(<CompanySelector onSubmit={vi.fn()} suggestions={suggestions} />);
+      expect(options()).toEqual(['IBM', 'AAPL']);
+      expect(document.querySelector('#custom-symbol-options option[value="AAPL"]')).toHaveTextContent('Apple Inc.');
+    });
+  });
 });

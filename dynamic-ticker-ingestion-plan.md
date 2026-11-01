@@ -165,3 +165,16 @@ These come from the requirements and the code research. Each has a recommended d
 - Refetching all quotes when one company is added could blank the Today view unless previous data is kept (Sub-Task 6, step 4).
 - Generated data for an unverifiable ticker can look real; the notice wording matters (D5).
 - Live mode was not verifiable here (Yahoo returned HTTP 429), so fallback behaviour is tested with mocked responses only.
+
+## Addendum: Last 7 Days / Last Quarter include added companies (top 8)
+
+Approved follow-up that **supersedes AC-13 and decision D3**: `WeekView` and `QuarterView` now include dynamically added companies, show only the top 8 by Daily Performance Ranking (today's % change), opt in to simulated-data fallback and show the same notice. Custom Company's ticker suggestion list (`<datalist>`) now offers tracked plus added companies.
+
+- [x] ST1 `utils/ranking.js` and `useTopCompanies` (tracked + added, ranked, top 8)
+- [x] ST2 window-aware generator (`generateMockSeries`: 7 -> 8 points, 30 -> 31, 90 -> 91)
+- [x] ST3 `useHistories` (variable-length list, per-symbol errors, fallback)
+- [x] ST4 `WeekView`: top-8 chart, caption, notice
+- [x] ST5 `QuarterView`: top-8 panels in ranked order, caption, notice
+- [x] ST6 `CompanySelector` `suggestions` prop; `App` passes tracked + added
+- [x] ST7 tests, README, validation
+- Behaviour change: tracked companies in these two views use deterministic mock history instead of random noise.

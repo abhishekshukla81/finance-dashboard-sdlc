@@ -1,6 +1,8 @@
-import { TICKERS } from '../constants/tickers.js';
+import { useTopCompanies } from '../hooks/useTopCompanies.js';
 import { useHistory } from '../hooks/useHistory.js';
 import AreaChart from '../components/charts/AreaChart.jsx';
+import SimulatedDataNotice from '../components/common/SimulatedDataNotice.jsx';
+import { SOURCE } from '../services/marketDataService.js';
 import { formatPercent } from '../utils/formatters.js';
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
@@ -8,16 +10,40 @@ const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
 /**
  * QuarterView
  *
- * Last-quarter area chart for each tracked company, shown as a grid.
+ * Last-quarter area chart for the top companies by today's performance
+ * (tracked plus any added from Custom Company, at most 8), shown as a grid.
  * Each panel also shows the quarter's Δ% at the top.
  */
 export default function QuarterView() {
+  const ranking = useTopCompanies();
+
+  if (ranking.loading && !ranking.top.length) {
+    return <div style={styles.stateSmall}>Loading quarterly trend…</div>;
+  }
+  if (ranking.error) {
+    return (
+      <div style={styles.errorSmall}>
+        ⚠ Unable to load trend data: {ranking.error}
+        <button onClick={ranking.refetch} style={styles.retrySmall}>Retry</button>
+      </div>
+    );
+  }
+
   return (
     <section>
+      {ranking.source === SOURCE.SIMULATED && <SimulatedDataNotice reason={ranking.reason} />}
       <h2 style={styles.heading}>Quarterly Trend</h2>
+      <p style={styles.sub} data-testid="top-caption">
+        Showing top {ranking.top.length} of {ranking.total} companies by today&apos;s performance.
+      </p>
       <div style={styles.grid}>
-        {TICKERS.map(({ symbol, name, color }) => (
-          <CompanyPanel key={symbol} symbol={symbol} name={name} color={color} />
+        {ranking.symbols.map((symbol) => (
+          <CompanyPanel
+            key={symbol}
+            symbol={symbol}
+            name={ranking.names[symbol] ?? symbol}
+            color={ranking.colors[symbol] ?? '#0f62fe'}
+          />
         ))}
       </div>
     </section>
@@ -25,7 +51,8 @@ export default function QuarterView() {
 }
 
 function CompanyPanel({ symbol, name, color }) {
-  const { history, loading, error, refetch } = useHistory(symbol, 'QUARTER', { useMock: USE_MOCK });
+  const { history, loading, error, refetch } =
+    useHistory(symbol, 'QUARTER', { useMock: USE_MOCK, fallback: true });
 
   const deltaPercent = (() => {
     if (history.length < 2) return null;
@@ -68,7 +95,8 @@ function CompanyPanel({ symbol, name, color }) {
 }
 
 const styles = {
-  heading: { fontSize: '1rem', fontWeight: 700, color: '#57606a', marginBottom: 16, marginTop: 0 },
+  heading: { fontSize: '1rem', fontWeight: 700, color: '#57606a', marginBottom: 4, marginTop: 0 },
+  sub:     { fontSize: '0.78rem', color: '#57606a', marginBottom: 16, marginTop: 0 },
   grid:    { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 },
   panel: {
     background: '#fff',

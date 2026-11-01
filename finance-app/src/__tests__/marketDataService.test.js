@@ -87,6 +87,14 @@ describe('getHistory', () => {
     expect(res.data).toHaveLength(31);
   });
 
+  it.each([['WEEK', 8], ['MONTH', 31], ['QUARTER', 91]])(
+    'sizes simulated history to the %s window (%i points)',
+    async (windowKey, points) => {
+      const res = await getHistory('AAPL', windowKey, { useMock: true });
+      expect(res.data).toHaveLength(points);
+    }
+  );
+
   it('requests the range for the window in live mode', async () => {
     fetchHistory.mockResolvedValue([{ symbol: 'AAPL', date: new Date(), close: 1 }]);
     const res = await getHistory('AAPL', 'MONTH');

@@ -1,3 +1,4 @@
+import { TICKERS } from './constants/tickers.js';
 import AppShell from './components/layout/AppShell.jsx';
 import useDashboardStore from './store/dashboardStore.js';
 import DayView from './views/DayView.jsx';
@@ -9,6 +10,8 @@ import CustomSymbolPanel from './components/custom/CustomSymbolPanel.jsx';
 export default function App() {
   const { activeTab } = useDashboardStore();
   const setCustomSymbol = useDashboardStore((s) => s.setCustomSymbol);
+  const addedCompanies   = useDashboardStore((s) => s.addedCompanies);
+  const suggestions = [...TICKERS, ...addedCompanies];
 
   const view = {
     day:     <DayView />,
@@ -21,7 +24,7 @@ export default function App() {
       {view}
       <section style={styles.section} aria-labelledby="custom-company-heading">
         <h2 id="custom-company-heading" style={styles.heading}>Custom Company</h2>
-        <CompanySelector onSubmit={setCustomSymbol} />
+        <CompanySelector onSubmit={setCustomSymbol} suggestions={suggestions} />
         <CustomSymbolPanel />
       </section>
     </AppShell>
