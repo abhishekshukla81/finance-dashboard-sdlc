@@ -20,7 +20,16 @@ Built with Vite, Recharts 3, and Zustand. Part of the IBM Bob SDLC Automation wo
 | Today    | Current-day quote card per company (price, Δ, volume, market cap) |
 | 7 Days   | Relative performance line chart — all companies on one axis, indexed to 100 |
 | Quarter  | 90-day area chart per company with QTD Δ%         |
-| Custom   | Enter any ticker; compares it with IBM (indexed to 100) over 7 days or a quarter. Invalid or unknown symbols show a clear message |
+
+## Custom Company
+
+At the bottom of every tab, below the existing view, a **Custom Company** section has one line of
+instruction, a ticker input and a **Load** button. Tickers must be 1–5 letters; anything else shows
+an inline error. A valid, resolvable symbol opens a panel with "Currently showing: XYZ", the
+company's quote card and a 30-day price chart. A symbol with no data shows `No data found for
+symbol "XYZ". Check the ticker and try again.` instead of any other company's data. **Clear**
+removes the panel, and the selection persists when you switch tabs. In mock mode only the six
+tracked companies resolve. The tracked-company dashboards above are unchanged.
 
 ## Quick Start
 
@@ -45,6 +54,7 @@ Set `VITE_USE_MOCK=false` to fetch live data through the Vite dev proxy.
 | `npm run build`     | Production build to `dist/`          |
 | `npm run preview`   | Serve production build locally       |
 | `npm run lint`      | Lint with oxlint (0 warnings target) |
+| `npm run validate`  | Lint, test and build in one step     |
 | `npm test`          | Run all unit tests with Vitest       |
 | `npm run test:watch`| Watch mode for tests                 |
 
@@ -55,10 +65,11 @@ src/
 ├── components/
 │   ├── layout/      AppShell, Header, TabBar
 │   ├── cards/       QuoteCard, ChangeIndicator
+│   ├── custom/      CompanySelector, CustomSymbolPanel
 │   └── charts/      ComparisonChart, AreaChart
-├── views/           DayView, WeekView, QuarterView, CustomView
+├── views/           DayView, WeekView, QuarterView
 ├── services/        yahooFinance.js, normalizer.js, mockData.js
-├── hooks/           useQuotes.js, useHistory.js
+├── hooks/           useQuotes.js, useHistory.js, useMarketData.js
 ├── store/           dashboardStore.js (Zustand)
 ├── constants/       tickers.js (add/swap companies here)
 ├── utils/           formatters.js, symbols.js
@@ -77,7 +88,7 @@ To add a competitor, edit [`src/constants/tickers.js`](src/constants/tickers.js)
 
 ```bash
 npm test
-# normalizer, formatters, symbols, QuoteCard, DayView, CustomView
+# normalizer, formatters, symbols, store, QuoteCard, DayView, PerformanceRanking, CompanySelector, CustomSymbolPanel, useCustomSymbolData, custom-company flow
 ```
 
 Tests never make network calls. All async data paths use mock fixtures from

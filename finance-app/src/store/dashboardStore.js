@@ -12,11 +12,12 @@ const useDashboardStore = create((set) => ({
   setActiveTab: (tab) => set({ activeTab: tab }),
 
   /**
-   * User-selected ticker for Part 2 "custom company" feature.
-   * null means no selection yet.
+   * User-selected ticker for the "custom company" panel shown below the
+   * active view. null means no selection yet.
    */
-  selectedTicker: null,
-  setSelectedTicker: (symbol) => set({ selectedTicker: symbol }),
+  customSymbol: null,
+  setCustomSymbol: (symbol) => set({ customSymbol: symbol }),
+  clearCustomSymbol: () => set({ customSymbol: null }),
 }));
 
 export default useDashboardStore;

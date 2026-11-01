@@ -12,10 +12,10 @@ describe('normalizeSymbol', () => {
 });
 
 describe('isValidSymbol', () => {
-  it.each(['AAPL', 'BRK-B', 'BF.B', '^GSPC', 'A'])('accepts %s', (s) => {
+  it.each(['AAPL', 'IBM', 'NVDA', 'A', 'GOOGL'])('accepts %s', (s) => {
     expect(isValidSymbol(s)).toBe(true);
   });
-  it.each(['', 'TOOLONGSYMBOL', 'AA PL', 'A/B', "A'; DROP", '<script>', '-AAPL', '^^X'])(
+  it.each(['', 'TOOLONG', 'IBM1', '123', 'AA PL', 'A/B', "A'; DROP", '<script>', 'BRK-B', '^GSPC'])(
     'rejects %j', (s) => {
       expect(isValidSymbol(s)).toBe(false);
     }

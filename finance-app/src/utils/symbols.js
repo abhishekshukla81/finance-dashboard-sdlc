@@ -6,8 +6,8 @@
  * symbol as untrusted input.
  */
 
-/** Allowlist: optional leading "^", then 1–10 of A-Z, 0-9, "." or "-" (e.g. BRK-B, ^GSPC). */
-const SYMBOL_PATTERN = /^\^?[A-Z0-9][A-Z0-9.-]{0,9}$/;
+/** Allowlist: 1–5 uppercase letters only (e.g. IBM, NVDA). */
+const SYMBOL_PATTERN = /^[A-Z]{1,5}$/;
 
 /**
  * Trim and uppercase raw user input.

@@ -1,6 +1,7 @@
 import { TICKERS } from '../constants/tickers.js';
 import { useQuotes } from '../hooks/useQuotes.js';
 import QuoteCard from '../components/cards/QuoteCard.jsx';
+import PerformanceRanking from '../components/cards/PerformanceRanking.jsx';
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
 const SYMBOLS  = TICKERS.map((t) => t.symbol);
@@ -20,7 +21,10 @@ export default function DayView() {
 
   return (
     <section>
-      <h2 style={styles.heading}>Today&apos;s Market Summary</h2>
+      <h2 style={styles.heading}>Daily Performance Ranking</h2>
+      <PerformanceRanking quotes={quotes} colors={COLOR_MAP} />
+
+      <h2 style={{ ...styles.heading, marginTop: 28 }}>Quote Detail</h2>
       <div style={styles.grid}>
         {quotes.map((q) => (
           <QuoteCard key={q.symbol} quote={q} color={COLOR_MAP[q.symbol] ?? '#0f62fe'} />
@@ -48,8 +52,11 @@ function EmptyState() {
 }
 
 const styles = {
-  heading: { fontSize: '1rem', fontWeight: 700, color: '#57606a', marginBottom: 16, marginTop: 0 },
-  grid:    { display: 'flex', flexWrap: 'wrap', gap: 16 },
+  heading: {
+    fontSize: '0.62rem', fontWeight: 700, color: '#57606a', marginBottom: 8, marginTop: 0,
+    textTransform: 'uppercase', letterSpacing: '0.06em',
+  },
+  grid:    { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12 },
   state:   { color: '#57606a', padding: 32, textAlign: 'center' },
   errorBox: {
     display: 'flex', alignItems: 'center', gap: 16,

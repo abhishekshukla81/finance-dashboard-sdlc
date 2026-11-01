@@ -32,6 +32,13 @@ describe('DayView — QuoteCard rendering', () => {
     const ibm = MOCK_QUOTES.find((q) => q.symbol === 'IBM');
     const colorMap = Object.fromEntries(TICKERS.map((t) => [t.symbol, t.color]));
     render(<QuoteCard quote={ibm} color={colorMap['IBM']} />);
-    expect(screen.getByText('$171.42')).toBeInTheDocument();
+    expect(screen.getByText('$175.40')).toBeInTheDocument();
+  });
+});
+
+describe('Expected Today layout data', () => {
+  it('tracks six companies including NVDA', () => {
+    expect(TICKERS.map((t) => t.symbol)).toEqual(['IBM', 'MSFT', 'ORCL', 'SAP', 'CRM', 'NVDA']);
+    expect(MOCK_QUOTES).toHaveLength(6);
   });
 });
