@@ -1,15 +1,15 @@
+.help {
+  font-size: 0.68rem;
+  color: #57606a;
+  margin: 0 0 8px;
+}
+
 .form {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
   margin-bottom: 8px;
-}
-
-.label {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: #1f2328;
 }
 
 .input {
@@ -34,16 +34,6 @@
 
 .error {
   color: #b91c1c;
-  font-size: 0.8rem;
-  margin-bottom: 8px;
-}
-
-.clear {
-  padding: 4px 12px;
-  border: 1px solid #d0d7de;
-  border-radius: 6px;
-  background: #fff;
-  color: #57606a;
-  cursor: pointer;
   font-size: 0.72rem;
+  margin-bottom: 8px;
 }

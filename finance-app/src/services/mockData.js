@@ -27,35 +27,14 @@ export const MOCK_QUOTES = TICKERS.map(({ symbol }) =>
 const BASE_PRICES = Object.fromEntries(FIXTURES.map((f) => [f.symbol, f.price]));
 
 /**
- * Symbols the offline mock mode recognises for the custom-company chart.
- * Anything else is treated as "not found" so the error path is testable offline.
+ * Symbols the offline mock mode can resolve: the tracked companies only.
+ * Any other symbol is "not found", so the no-data path works offline.
  */
-export const MOCK_SUPPORTED_SYMBOLS = [
-  ...new Set([...TICKERS.map(({ symbol }) => symbol), 'AAPL', 'GOOGL', 'AMZN', 'META', 'TSLA']),
-];
+export const MOCK_SUPPORTED_SYMBOLS = TICKERS.map(({ symbol }) => symbol);
 
-/** Offline quote for any symbol the mock mode supports, or null. */
+/** Offline quote for a supported symbol, or null. */
 export function getMockQuote(symbol) {
-  const tracked = MOCK_QUOTES.find((q) => q.symbol === symbol);
-  if (tracked) return tracked;
-  if (!MOCK_SUPPORTED_SYMBOLS.includes(symbol)) return null;
-
-  const price = BASE_PRICES[symbol] ?? 150;
-  return withDefaults({
-    symbol,
-    name: symbol,
-    price,
-    change: 1,
-    changePercent: parseFloat(((1 / price) * 100).toFixed(2)),
-    previousClose: price - 1,
-    open: price - 0.5,
-    high: price + 1.5,
-    low: price - 1.5,
-    volume: 5_000_000,
-    marketCap: Math.round(price * 900_000_000),
-    fiftyTwoWeekLow: Math.round(price * 70) / 100,
-    fiftyTwoWeekHigh: Math.round(price * 130) / 100,
-  });
+  return MOCK_QUOTES.find((q) => q.symbol === symbol) ?? null;
 }
 
 // ─── History fixture generator ───────────────────────────────────────────────

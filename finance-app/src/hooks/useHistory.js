@@ -9,7 +9,7 @@ import { RANGES } from '../constants/tickers.js';
  * Fetches OHLC close history for a single ticker symbol.
  *
  * @param {string} symbol
- * @param {'DAY'|'WEEK'|'QUARTER'} windowKey  - Key into RANGES constant
+ * @param {'DAY'|'WEEK'|'MONTH'|'QUARTER'} windowKey  - Key into RANGES constant
  * @param {{ useMock?: boolean }} [options]
  * @returns {{ history: HistoryPoint[], loading: boolean, error: string|null, refetch: () => void }}
  */
@@ -37,7 +37,7 @@ export function useHistory(symbol, windowKey, { useMock = false } = {}) {
       try {
         let data;
         if (useMock) {
-          const days = windowKey === 'QUARTER' ? 90 : 7;
+          const days = { QUARTER: 90, MONTH: 30 }[windowKey] ?? 7;
           data = generateMockHistory(symbol, days);
         } else {
           data = await fetchHistory(symbol, rangeConfig.range, rangeConfig.interval);

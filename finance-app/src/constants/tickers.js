@@ -15,6 +15,7 @@ export const TICKERS = [
 /** Allowed Yahoo Finance range values for history calls */
 export const RANGES = {
   DAY:     { range: '1d',  interval: '5m',  label: 'Today' },
+  MONTH:   { range: '1mo', interval: '1d',  label: 'Last 30 Days' },
   WEEK:    { range: '5d',  interval: '1d',  label: 'Last 7 Days' },
   QUARTER: { range: '3mo', interval: '1wk', label: 'Last Quarter' },
 };

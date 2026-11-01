@@ -6,17 +6,15 @@ import styles from './CompanySelector.module.css';
 /**
  * CompanySelector
  *
- * Ticker input for the custom-company panel. Validates the format (1–5
- * uppercase letters) and reports the result through callbacks; it holds no
- * global state itself.
+ * One line of instruction, a ticker input and a Load button. Validates the
+ * format (1–5 uppercase letters) and reports a valid symbol through
+ * `onSubmit`; it holds no global state.
  *
  * Props:
  *   onSubmit  {(symbol: string) => void}  - called with a valid, normalised symbol
- *   onClear   {() => void}                - called when the Clear button is pressed
- *   value     {string|null}               - currently selected symbol (shows Clear when set)
  */
-export default function CompanySelector({ onSubmit, onClear, value = null }) {
-  const [input, setInput] = useState(value ?? '');
+export default function CompanySelector({ onSubmit }) {
+  const [input, setInput] = useState('');
   const [formError, setFormError] = useState(null);
 
   const handleSubmit = (e) => {
@@ -31,18 +29,16 @@ export default function CompanySelector({ onSubmit, onClear, value = null }) {
     onSubmit(next);
   };
 
-  const handleClear = () => {
-    setInput('');
-    setFormError(null);
-    onClear();
-  };
-
   return (
     <div>
+      <p id="custom-symbol-help" className={styles.help}>
+        Enter a ticker symbol to load that company&apos;s quote and 30-day price chart.
+      </p>
       <form onSubmit={handleSubmit} className={styles.form} noValidate>
-        <label htmlFor="custom-symbol" className={styles.label}>Compare a company with IBM</label>
         <input
           id="custom-symbol"
+          aria-label="Ticker symbol"
+          aria-describedby="custom-symbol-help"
           list="custom-symbol-options"
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -57,10 +53,7 @@ export default function CompanySelector({ onSubmit, onClear, value = null }) {
             <option key={symbol} value={symbol}>{name}</option>
           ))}
         </datalist>
-        <button type="submit" className={styles.submit}>Compare</button>
-        {value && (
-          <button type="button" onClick={handleClear} className={styles.clear}>Clear</button>
-        )}
+        <button type="submit" className={styles.submit}>Load</button>
       </form>
       {formError && <div role="alert" className={styles.error}>{formError}</div>}
     </div>

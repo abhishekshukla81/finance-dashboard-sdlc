@@ -21,13 +21,15 @@ Built with Vite, Recharts 3, and Zustand. Part of the IBM Bob SDLC Automation wo
 | 7 Days   | Relative performance line chart — all companies on one axis, indexed to 100 |
 | Quarter  | 90-day area chart per company with QTD Δ%         |
 
-## Custom Company Panel
+## Custom Company
 
-Below every tab, a **Custom Company vs IBM** panel lets you enter any ticker (for example `NVDA`)
-and compares it with IBM over 7 days or a quarter, both indexed to 100, with a summary card for
-the chosen company. Tickers must be 1–5 letters; anything else is rejected up front, and a symbol with no data shows "No data found for XYZ" instead of any
-other company's data. **Clear** hides the panel content, and the selection persists when you switch tabs.
-The tracked-company dashboards above it are unchanged.
+At the bottom of every tab, below the existing view, a **Custom Company** section has one line of
+instruction, a ticker input and a **Load** button. Tickers must be 1–5 letters; anything else shows
+an inline error. A valid, resolvable symbol opens a panel with "Currently showing: XYZ", the
+company's quote card and a 30-day price chart. A symbol with no data shows `No data found for
+symbol "XYZ". Check the ticker and try again.` instead of any other company's data. **Clear**
+removes the panel, and the selection persists when you switch tabs. In mock mode only the six
+tracked companies resolve. The tracked-company dashboards above are unchanged.
 
 ## Quick Start
 
@@ -86,7 +88,7 @@ To add a competitor, edit [`src/constants/tickers.js`](src/constants/tickers.js)
 
 ```bash
 npm test
-# normalizer, formatters, symbols, store, QuoteCard, DayView, CompanySelector, CustomSymbolPanel, useCustomSymbolData
+# normalizer, formatters, symbols, store, QuoteCard, DayView, PerformanceRanking, CompanySelector, CustomSymbolPanel, useCustomSymbolData, custom-company flow
 ```
 
 Tests never make network calls. All async data paths use mock fixtures from
