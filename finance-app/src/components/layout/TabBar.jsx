@@ -10,23 +10,21 @@ const TABS = [
 /**
  * TabBar
  *
- * Navigation strip that switches the active dashboard view.
+ * Segmented switch (Today / Last 7 Days / Last Quarter) that selects the
+ * active dashboard view.
  */
 export default function TabBar() {
   const { activeTab, setActiveTab } = useDashboardStore();
 
   return (
-    <nav style={styles.nav} role="tablist">
+    <nav style={styles.nav} role="tablist" aria-label="Time window">
       {TABS.map(({ key, label }) => (
         <button
           key={key}
           role="tab"
           aria-selected={activeTab === key}
           onClick={() => setActiveTab(key)}
-          style={{
-            ...styles.tab,
-            ...(activeTab === key ? styles.active : {}),
-          }}
+          style={{ ...styles.tab, ...(activeTab === key ? styles.active : {}) }}
         >
           {label}
         </button>
@@ -36,28 +34,20 @@ export default function TabBar() {
 }
 
 const styles = {
-  nav: {
-    display: 'flex',
-    gap: 4,
-    padding: '0 24px',
-    borderBottom: '1px solid #e5e7eb',
-    background: '#fff',
-  },
+  nav: { display: 'flex', gap: 4 },
   tab: {
-    padding: '10px 20px',
-    background: 'none',
-    border: 'none',
-    borderBottom: '2px solid transparent',
+    padding: '4px 10px',
+    background: '#fff',
+    border: '1px solid #e5e7eb',
+    borderRadius: 5,
     cursor: 'pointer',
-    fontSize: '0.9rem',
-    fontWeight: 500,
+    fontSize: '0.68rem',
+    fontWeight: 600,
     color: '#57606a',
-    marginBottom: -1,
-    transition: 'color 0.15s',
   },
   active: {
-    color: '#0f62fe',
-    borderBottomColor: '#0f62fe',
-    fontWeight: 700,
+    background: '#3b82d4',
+    borderColor: '#3b82d4',
+    color: '#fff',
   },
 };

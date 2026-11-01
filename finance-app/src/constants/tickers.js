@@ -9,11 +9,12 @@ export const TICKERS = [
   { symbol: 'ORCL', name: 'Oracle',     color: '#e8612c' },
   { symbol: 'SAP',  name: 'SAP',        color: '#00b050' },
   { symbol: 'CRM',  name: 'Salesforce', color: '#00a1e0' },
+  { symbol: 'NVDA', name: 'NVIDIA',     color: '#4589ff' },
 ];
 
 /** Allowed Yahoo Finance range values for history calls */
 export const RANGES = {
   DAY:     { range: '1d',  interval: '5m',  label: 'Today' },
-  WEEK:    { range: '5d',  interval: '1d',  label: '7 Days' },
-  QUARTER: { range: '3mo', interval: '1wk', label: 'Quarter' },
+  WEEK:    { range: '5d',  interval: '1d',  label: 'Last 7 Days' },
+  QUARTER: { range: '3mo', interval: '1wk', label: 'Last Quarter' },
 };

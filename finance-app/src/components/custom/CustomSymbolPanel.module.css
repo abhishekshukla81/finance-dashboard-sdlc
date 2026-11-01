@@ -1,20 +1,20 @@
 .panel {
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 1px solid #e5e7eb;
+  margin-top: 28px;
 }
 
 .heading {
-  font-size: 1rem;
+  font-size: 0.62rem;
   font-weight: 700;
   color: #57606a;
   margin: 0 0 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .sub {
-  font-size: 0.78rem;
+  font-size: 0.68rem;
   color: #57606a;
-  margin: 0 0 12px;
+  margin: 0 0 10px;
 }
 
 .windows {
@@ -24,13 +24,13 @@
 }
 
 .windowBtn {
-  padding: 5px 12px;
+  padding: 3px 10px;
   border: 1px solid #d0d7de;
   border-radius: 6px;
   background: #fff;
   color: #57606a;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.68rem;
 }
 
 .windowActive {
@@ -88,6 +88,6 @@
 }
 
 .summary {
-  max-width: 320px;
+  max-width: 260px;
   margin-bottom: 16px;
 }

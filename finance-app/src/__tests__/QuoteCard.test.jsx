@@ -40,6 +40,6 @@ describe('QuoteCard', () => {
   it('shows em-dash when change is null', () => {
     const q = { ...mockQuote, change: null, changePercent: null };
     render(<QuoteCard quote={q} />);
-    expect(screen.getByText('—')).toBeInTheDocument();
+    expect(screen.getByTestId('change')).toHaveTextContent('—');
   });
 });
