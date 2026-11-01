@@ -1,36 +1,45 @@
 import { useState } from 'react';
 import { TICKERS } from '../../constants/tickers.js';
-import useDashboardStore from '../../store/dashboardStore.js';
 import { normalizeSymbol, isValidSymbol } from '../../utils/symbols.js';
 import styles from './CompanySelector.module.css';
 
 /**
  * CompanySelector
  *
- * Ticker input for the custom-company panel. Validates the format, then
- * stores the symbol; fetching and no-data handling live in CustomSymbolPanel.
+ * Ticker input for the custom-company panel. Validates the format (1–5
+ * uppercase letters) and reports the result through callbacks; it holds no
+ * global state itself.
+ *
+ * Props:
+ *   onSubmit  {(symbol: string) => void}  - called with a valid, normalised symbol
+ *   onClear   {() => void}                - called when the Clear button is pressed
+ *   value     {string|null}               - currently selected symbol (shows Clear when set)
  */
-export default function CompanySelector() {
-  const customSymbol    = useDashboardStore((s) => s.customSymbol);
-  const setCustomSymbol = useDashboardStore((s) => s.setCustomSymbol);
-  const [input, setInput] = useState(customSymbol ?? '');
+export default function CompanySelector({ onSubmit, onClear, value = null }) {
+  const [input, setInput] = useState(value ?? '');
   const [formError, setFormError] = useState(null);
 
-  const onSubmit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     const next = normalizeSymbol(input);
     if (!isValidSymbol(next)) {
-      setFormError('Enter a valid ticker symbol (letters, digits, "." or "-", up to 10 characters).');
+      setFormError('Enter a ticker of 1–5 letters, for example NVDA.');
       return;
     }
     setFormError(null);
     setInput(next);
-    setCustomSymbol(next);
+    onSubmit(next);
+  };
+
+  const handleClear = () => {
+    setInput('');
+    setFormError(null);
+    onClear();
   };
 
   return (
     <div>
-      <form onSubmit={onSubmit} className={styles.form} noValidate>
+      <form onSubmit={handleSubmit} className={styles.form} noValidate>
         <label htmlFor="custom-symbol" className={styles.label}>Compare a company with IBM</label>
         <input
           id="custom-symbol"
@@ -38,7 +47,7 @@ export default function CompanySelector() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="e.g. NVDA"
-          maxLength={11}
+          maxLength={8}
           autoComplete="off"
           className={styles.input}
           aria-invalid={Boolean(formError)}
@@ -49,6 +58,9 @@ export default function CompanySelector() {
           ))}
         </datalist>
         <button type="submit" className={styles.submit}>Compare</button>
+        {value && (
+          <button type="button" onClick={handleClear} className={styles.clear}>Clear</button>
+        )}
       </form>
       {formError && <div role="alert" className={styles.error}>{formError}</div>}
     </div>

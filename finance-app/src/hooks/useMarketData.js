@@ -1,5 +1,6 @@
 import { useHistory } from './useHistory.js';
-import { MOCK_SUPPORTED_SYMBOLS } from '../services/mockData.js';
+import { useQuotes } from './useQuotes.js';
+import { MOCK_SUPPORTED_SYMBOLS, getMockQuote } from '../services/mockData.js';
 
 export const BASELINE_SYMBOL = 'IBM';
 
@@ -16,8 +17,8 @@ const isNotFoundError = (message) => /HTTP 4\d\d/.test(message ?? '');
  * @param {string|null} symbol
  * @param {'WEEK'|'QUARTER'} windowKey
  * @param {{ useMock?: boolean }} [options]
- * @returns {{ seriesData: object, loading: boolean, error: string|null,
- *             notFound: boolean, refetch: () => void }}
+ * @returns {{ seriesData: object, quote: object|null, loading: boolean,
+ *             error: string|null, notFound: boolean, refetch: () => void }}
  */
 export function useCustomSymbolData(symbol, windowKey, { useMock = false } = {}) {
   // Offline mock mode only knows a fixed set of symbols.
@@ -26,6 +27,12 @@ export function useCustomSymbolData(symbol, windowKey, { useMock = false } = {})
 
   const baseline = useHistory(BASELINE_SYMBOL, windowKey, { useMock });
   const custom   = useHistory(fetchSymbol,     windowKey, { useMock });
+
+  const quotesResult = useQuotes(fetchSymbol ? [fetchSymbol] : [], { useMock });
+  const quote = fetchSymbol
+    ? quotesResult.quotes.find((q) => q.symbol === fetchSymbol)
+      ?? (useMock ? getMockQuote(fetchSymbol) : null)
+    : null;
 
   const loading = Boolean(fetchSymbol) && (baseline.loading || custom.loading);
   const error   = baseline.error ?? custom.error;
@@ -38,7 +45,7 @@ export function useCustomSymbolData(symbol, windowKey, { useMock = false } = {})
     ? { [BASELINE_SYMBOL]: baseline.history }
     : { [BASELINE_SYMBOL]: baseline.history, [symbol]: custom.history };
 
-  const refetch = () => { baseline.refetch(); custom.refetch(); };
+  const refetch = () => { baseline.refetch(); custom.refetch(); quotesResult.refetch(); };
 
-  return { seriesData, loading, error, notFound, refetch };
+  return { seriesData, quote, loading, error, notFound, refetch };
 }

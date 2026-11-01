@@ -24,9 +24,10 @@ Built with Vite, Recharts 3, and Zustand. Part of the IBM Bob SDLC Automation wo
 ## Custom Company Panel
 
 Below every tab, a **Custom Company vs IBM** panel lets you enter any ticker (for example `NVDA`)
-and compares it with IBM over 7 days or a quarter, both indexed to 100. Invalid symbols are
-rejected up front, and a symbol with no data shows "No data found for XYZ" instead of any
-other company's data. The tracked-company dashboards above it are unchanged.
+and compares it with IBM over 7 days or a quarter, both indexed to 100, with a summary card for
+the chosen company. Tickers must be 1–5 letters; anything else is rejected up front, and a symbol with no data shows "No data found for XYZ" instead of any
+other company's data. **Clear** hides the panel content, and the selection persists when you switch tabs.
+The tracked-company dashboards above it are unchanged.
 
 ## Quick Start
 
@@ -51,6 +52,7 @@ Set `VITE_USE_MOCK=false` to fetch live data through the Vite dev proxy.
 | `npm run build`     | Production build to `dist/`          |
 | `npm run preview`   | Serve production build locally       |
 | `npm run lint`      | Lint with oxlint (0 warnings target) |
+| `npm run validate`  | Lint, test and build in one step     |
 | `npm test`          | Run all unit tests with Vitest       |
 | `npm run test:watch`| Watch mode for tests                 |
 
@@ -84,7 +86,7 @@ To add a competitor, edit [`src/constants/tickers.js`](src/constants/tickers.js)
 
 ```bash
 npm test
-# normalizer, formatters, symbols, QuoteCard, DayView, CustomSymbolPanel, useCustomSymbolData
+# normalizer, formatters, symbols, store, QuoteCard, DayView, CompanySelector, CustomSymbolPanel, useCustomSymbolData
 ```
 
 Tests never make network calls. All async data paths use mock fixtures from

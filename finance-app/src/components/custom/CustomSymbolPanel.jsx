@@ -3,6 +3,7 @@ import { TICKERS } from '../../constants/tickers.js';
 import useDashboardStore from '../../store/dashboardStore.js';
 import { useCustomSymbolData, BASELINE_SYMBOL } from '../../hooks/useMarketData.js';
 import ComparisonChart from '../charts/ComparisonChart.jsx';
+import QuoteCard from '../cards/QuoteCard.jsx';
 import CompanySelector from './CompanySelector.jsx';
 import styles from './CustomSymbolPanel.module.css';
 
@@ -22,7 +23,9 @@ const WINDOWS      = [
  * store and never touches TICKERS, so the existing views are unchanged.
  */
 export default function CustomSymbolPanel() {
-  const customSymbol = useDashboardStore((s) => s.customSymbol);
+  const customSymbol      = useDashboardStore((s) => s.customSymbol);
+  const setCustomSymbol   = useDashboardStore((s) => s.setCustomSymbol);
+  const clearCustomSymbol = useDashboardStore((s) => s.clearCustomSymbol);
   const [windowKey, setWindowKey] = useState('WEEK');
 
   return (
@@ -31,7 +34,7 @@ export default function CustomSymbolPanel() {
       <p className={styles.sub}>
         Indexed to 100 at the start of the window — shows relative movement, not absolute price.
       </p>
-      <CompanySelector />
+      <CompanySelector value={customSymbol} onSubmit={setCustomSymbol} onClear={clearCustomSymbol} />
       <div className={styles.windows} role="group" aria-label="Time window">
         {WINDOWS.map(({ key, label }) => (
           <button
@@ -56,7 +59,7 @@ export default function CustomSymbolPanel() {
 
 /** Keyed by symbol in the parent so a new symbol always starts from a fresh loading state. */
 function CustomChart({ symbol, windowKey }) {
-  const { seriesData, loading, error, notFound, refetch } =
+  const { seriesData, quote, loading, error, notFound, refetch } =
     useCustomSymbolData(symbol, windowKey, { useMock: USE_MOCK });
 
   if (notFound) {
@@ -66,7 +69,14 @@ function CustomChart({ symbol, windowKey }) {
       </div>
     );
   }
-  if (loading) return <div className={styles.state}>Loading {symbol}…</div>;
+  if (loading) {
+    return (
+      <div className={styles.state} role="status" aria-live="polite">
+        <div className={styles.spinner} aria-hidden="true" />
+        Loading {symbol}…
+      </div>
+    );
+  }
   if (error) {
     return (
       <div role="alert" className={styles.errorBox}>
@@ -77,5 +87,14 @@ function CustomChart({ symbol, windowKey }) {
   }
 
   const colors = { ...COLOR_MAP, ...(COLOR_MAP[symbol] ? {} : { [symbol]: CUSTOM_COLOR }) };
-  return <ComparisonChart seriesData={seriesData} colors={colors} height={340} />;
+  return (
+    <>
+      {quote && (
+        <div className={styles.summary} data-testid="summary-card">
+          <QuoteCard quote={quote} color={colors[symbol]} />
+        </div>
+      )}
+      <ComparisonChart seriesData={seriesData} colors={colors} height={340} />
+    </>
+  );
 }

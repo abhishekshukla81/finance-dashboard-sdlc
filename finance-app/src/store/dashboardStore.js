@@ -17,6 +17,7 @@ const useDashboardStore = create((set) => ({
    */
   customSymbol: null,
   setCustomSymbol: (symbol) => set({ customSymbol: symbol }),
+  clearCustomSymbol: () => set({ customSymbol: null }),
 }));
 
 export default useDashboardStore;

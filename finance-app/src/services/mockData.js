@@ -9,9 +9,9 @@ import { TICKERS } from '../constants/tickers.js';
 // ─── Quote fixtures ──────────────────────────────────────────────────────────
 
 const BASE_PRICES = { IBM: 171.42, MSFT: 415.30, ORCL: 139.85, SAP: 211.60, CRM: 302.75, NVDA: 118.40 };
-const BASE_CHANGES = { IBM: 1.23, MSFT: -2.15, ORCL: 0.95, SAP: 3.40, CRM: -1.80 };
+const BASE_CHANGES = { IBM: 1.23, MSFT: -2.15, ORCL: 0.95, SAP: 3.40, CRM: -1.80, NVDA: 2.10 };
 
-export const MOCK_QUOTES = TICKERS.map(({ symbol, name }) => {
+function buildMockQuote(symbol, name) {
   const price  = BASE_PRICES[symbol] ?? 100;
   const change = BASE_CHANGES[symbol] ?? 0;
   return {
@@ -28,7 +28,19 @@ export const MOCK_QUOTES = TICKERS.map(({ symbol, name }) => {
     currency:  'USD',
     marketState: 'REGULAR',
   };
-});
+}
+
+export const MOCK_QUOTES = TICKERS.map(({ symbol, name }) => buildMockQuote(symbol, name));
+
+/** Extra offline fixture for the custom-company panel (not a tracked company). */
+export const MOCK_CUSTOM_QUOTES = [buildMockQuote('NVDA', 'NVIDIA')];
+
+/** Offline quote for any symbol the mock mode supports, or null. */
+export function getMockQuote(symbol) {
+  return MOCK_QUOTES.find((q) => q.symbol === symbol)
+    ?? MOCK_CUSTOM_QUOTES.find((q) => q.symbol === symbol)
+    ?? (MOCK_SUPPORTED_SYMBOLS.includes(symbol) ? buildMockQuote(symbol, symbol) : null);
+}
 
 // ─── History fixture generator ───────────────────────────────────────────────
 

@@ -9,12 +9,14 @@ describe('useCustomSymbolData (mock mode)', () => {
     expect(Object.keys(result.current.seriesData)).toEqual(['IBM', 'NVDA']);
     expect(result.current.seriesData.NVDA.length).toBeGreaterThan(0);
     expect(result.current.notFound).toBe(false);
+    expect(result.current.quote?.symbol).toBe('NVDA');
   });
 
   it('reports notFound for an unsupported symbol instead of substituting data', async () => {
     const { result } = renderHook(() => useCustomSymbolData('ZZZZ', 'WEEK', { useMock: true }));
     await waitFor(() => expect(result.current.notFound).toBe(true));
     expect(result.current.seriesData.ZZZZ).toEqual([]);
+    expect(result.current.quote).toBeNull();
   });
 
   it('is idle without a symbol', () => {
