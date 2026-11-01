@@ -5,6 +5,8 @@
  * All shapes match the output of normalizer.js exactly.
  */
 import { TICKERS } from '../constants/tickers.js';
+import { isValidSymbol } from '../utils/symbols.js';
+import { generateMockQuote, generateMockHistory30 } from './mockGenerator.js';
 
 // ─── Quote fixtures ──────────────────────────────────────────────────────────
 
@@ -27,14 +29,23 @@ export const MOCK_QUOTES = TICKERS.map(({ symbol }) =>
 const BASE_PRICES = Object.fromEntries(FIXTURES.map((f) => [f.symbol, f.price]));
 
 /**
- * Symbols the offline mock mode can resolve: the tracked companies only.
- * Any other symbol is "not found", so the no-data path works offline.
+ * Offline quote for any valid ticker, or null for an invalid one.
+ * Tracked companies keep their fixture values; every other valid ticker gets
+ * deterministic generated data (simulated, unverified).
  */
-export const MOCK_SUPPORTED_SYMBOLS = TICKERS.map(({ symbol }) => symbol);
-
-/** Offline quote for a supported symbol, or null. */
 export function getMockQuote(symbol) {
-  return MOCK_QUOTES.find((q) => q.symbol === symbol) ?? null;
+  const tracked = MOCK_QUOTES.find((q) => q.symbol === symbol);
+  if (tracked) return tracked;
+  return isValidSymbol(symbol) ? generateMockQuote(symbol) : null;
+}
+
+/**
+ * Deterministic 30-day (31-point) offline history for any valid ticker,
+ * ending at the same price as its offline quote. Null for an invalid ticker.
+ */
+export function getMockHistory30(symbol) {
+  const quote = getMockQuote(symbol);
+  return quote ? generateMockHistory30(symbol, quote.price) : null;
 }
 
 // ─── History fixture generator ───────────────────────────────────────────────

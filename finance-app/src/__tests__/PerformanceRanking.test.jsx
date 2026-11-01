@@ -17,4 +17,11 @@ describe('PerformanceRanking', () => {
     expect(screen.getByText('+1.60%')).toBeInTheDocument();
     expect(screen.getByText('-0.59%')).toBeInTheDocument();
   });
+
+  it('numbers rows from startRank so ranks continue across pages', () => {
+    render(<PerformanceRanking quotes={MOCK_QUOTES.slice(0, 2)} startRank={7} />);
+    const rows = screen.getAllByRole('listitem');
+    expect(rows[0]).toHaveTextContent(/^7/);
+    expect(rows[1]).toHaveTextContent(/^8/);
+  });
 });

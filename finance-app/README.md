@@ -17,7 +17,7 @@ Built with Vite, Recharts 3, and Zustand. Part of the IBM Bob SDLC Automation wo
 
 | Tab      | What it shows                                     |
 |----------|---------------------------------------------------|
-| Today    | Current-day quote card per company (price, Δ, volume, market cap) |
+| Today    | Daily Performance Ranking and a quote card per company (price, Δ, volume, market cap), including added tickers, 6 per page |
 | 7 Days   | Relative performance line chart — all companies on one axis, indexed to 100 |
 | Quarter  | 90-day area chart per company with QTD Δ%         |
 
@@ -28,8 +28,31 @@ instruction, a ticker input and a **Load** button. Tickers must be 1–5 letters
 an inline error. A valid, resolvable symbol opens a panel with "Currently showing: XYZ", the
 company's quote card and a 30-day price chart. A symbol with no data shows `No data found for
 symbol "XYZ". Check the ticker and try again.` instead of any other company's data. **Clear**
-removes the panel, and the selection persists when you switch tabs. In mock mode only the six
-tracked companies resolve. The tracked-company dashboards above are unchanged.
+removes the panel, and the selection persists when you switch tabs. The tracked-company
+dashboards above are unchanged.
+
+### Dynamic tickers and pagination
+
+A ticker that loads successfully in the Custom Company section is also added to the **Today** tab
+(Daily Performance Ranking and Quote Detail). Tickers are normalised, never duplicated (including
+the six tracked companies), and kept for the session; **Clear** does not remove them. Symbols that
+fail or return no data are never added. **Last 7 Days** and **Last Quarter** are not affected.
+
+Above 6 companies both Today sections show 6 per page with Previous / Page X of Y / Next controls.
+They share one page and one ranked order, and rank numbers continue across pages (page 2 starts
+at 7). With 6 or fewer companies there are no controls.
+
+### Simulated data
+
+For any valid ticker without live data the app generates deterministic **simulated** quotes and a
+30-day history (same ticker, same numbers). Tracked companies keep their fixed fixture values.
+
+- `VITE_USE_MOCK=true`: every valid ticker resolves to simulated data.
+- `VITE_USE_MOCK=false`: HTTP 429, HTTP 5xx, timeouts and network failures fall back to simulated
+  data. HTTP 404 and empty results do **not** fall back and still show the no-data message.
+- Whenever simulated data is displayed on the Today tab or in the Custom panel, a notice says it is
+  generated and unverified. A made-up ticker therefore appears as a simulated company; it is not
+  checked against a real market.
 
 ## Quick Start
 
@@ -66,13 +89,14 @@ src/
 │   ├── layout/      AppShell, Header, TabBar
 │   ├── cards/       QuoteCard, ChangeIndicator
 │   ├── custom/      CompanySelector, CustomSymbolPanel
+│   ├── common/      Pagination, SimulatedDataNotice
 │   └── charts/      ComparisonChart, AreaChart
 ├── views/           DayView, WeekView, QuarterView
-├── services/        yahooFinance.js, normalizer.js, mockData.js
+├── services/        yahooFinance.js, normalizer.js, mockData.js, mockGenerator.js, marketDataService.js
 ├── hooks/           useQuotes.js, useHistory.js, useMarketData.js
 ├── store/           dashboardStore.js (Zustand)
 ├── constants/       tickers.js (add/swap companies here)
-├── utils/           formatters.js, symbols.js
+├── utils/           formatters.js, symbols.js, pagination.js
 └── __tests__/       unit tests
 ```
 
@@ -88,7 +112,8 @@ To add a competitor, edit [`src/constants/tickers.js`](src/constants/tickers.js)
 
 ```bash
 npm test
-# normalizer, formatters, symbols, store, QuoteCard, DayView, PerformanceRanking, CompanySelector, CustomSymbolPanel, useCustomSymbolData, custom-company flow
+# normalizer, formatters, symbols, store, QuoteCard, DayView, PerformanceRanking, CompanySelector, CustomSymbolPanel,
+# useCustomSymbolData, custom-company flow, mock generator, fallback service/hooks, pagination, simulated notice
 ```
 
 Tests never make network calls. All async data paths use mock fixtures from

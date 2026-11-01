@@ -25,11 +25,15 @@ async function apiFetch(path) {
   try {
     const res = await fetch(`${API_BASE}${path}`, { signal: controller.signal });
     clearTimeout(timer);
-    if (!res.ok) throw new Error(`HTTP ${res.status} from ${path}`);
+    if (!res.ok) {
+      throw Object.assign(new Error(`HTTP ${res.status} from ${path}`), { status: res.status });
+    }
     return res.json();
   } catch (err) {
     clearTimeout(timer);
-    if (err.name === 'AbortError') throw new Error(`Request timed out: ${path}`);
+    if (err.name === 'AbortError') {
+      throw Object.assign(new Error(`Request timed out: ${path}`), { code: 'TIMEOUT' });
+    }
     throw err;
   }
 }

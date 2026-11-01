@@ -12,6 +12,18 @@ export const TICKERS = [
   { symbol: 'NVDA', name: 'NVIDIA',     color: '#4589ff' },
 ];
 
+/** Companies shown per page in Daily Performance Ranking and Quote Detail. */
+export const PAGE_SIZE = 6;
+
+/**
+ * Colours for dynamically added companies, assigned in order and cycled.
+ * Distinct from the tracked-company colours above.
+ */
+export const ADDED_PALETTE = [
+  '#d12771', '#009d9a', '#8a3ffc', '#b28600',
+  '#198038', '#fa4d56', '#1192e8', '#9f1853',
+];
+
 /** Allowed Yahoo Finance range values for history calls */
 export const RANGES = {
   DAY:     { range: '1d',  interval: '5m',  label: 'Today' },
