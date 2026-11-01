@@ -23,19 +23,24 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
+          cache-dependency-path: finance-app/package-lock.json
 
       - name: Install dependencies
+        working-directory: finance-app
         run: npm install
 
       - name: Lint
+        working-directory: finance-app
         run: npm run lint --if-present
 
       - name: Test
-        run: npm test --if-present -- --runInBand
+        working-directory: finance-app
+        run: npm test
 
       - name: Build
+        working-directory: finance-app
         run: npm run build --if-present
 
   bob-feature-flow:
